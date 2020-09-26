@@ -13,13 +13,17 @@
 </head>
  
 <body>
-
+    <h3>Telemetry Data</h3>
 	<table>
 	<thead>
         <tr>
             <th>ID</th>
-            <th>Channel</th>
-            <th>Origin IP</th>
+            <th>Created</th>
+            <th>Node Id</th>
+            <th>API Descriptor</th>
+            <th>Status Code</th>
+            <th>Response</th>
+            <th>Status</th>
         </tr>
 	</thead>
 	<br/>
@@ -29,8 +33,11 @@
             <td>{{item[0]}}</td>
             <td>{{item[1]}}</td>
             <td>{{item[2]}}</td>
+            <td>{{item[3]}}</td>
+            <td>{{item[4]}}</td>
+            <td>{{item[5]}}</td>
+            <td>{{item[6]}}</td>
         </tr>
-	<br/>
         {% endfor %}
 	</tbody>
 	</table>

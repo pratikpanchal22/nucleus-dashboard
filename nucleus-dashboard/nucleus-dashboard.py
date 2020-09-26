@@ -6,7 +6,7 @@ app = Flask(__name__)
 mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'user'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
-app.config['MYSQL_DATABASE_DB'] = 'appDbSandbox'
+app.config['MYSQL_DATABASE_DB'] = 'appDb'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
@@ -22,14 +22,26 @@ def template():
     cur.close()
     return render_template('template.html')
 
-@app.route("/template1.html")
-def template1():
+@app.route("/nodeList.html")
+@app.route("/nodelist.html")
+def nodeList():
     cur = mysql.get_db().cursor()
-    cur.execute("select id, channelId, origin from messageLogTable;")
+    cur.execute("select * from node_list order by ts_created asc;")
     results = cur.fetchall()
     print("Type of results: ", type(results))
     cur.close()
-    return render_template('template1.html', data=results)
+    return render_template('nodeList.html', data=results)
+
+
+@app.route("/nodeTelemetry.html")
+@app.route("/nodetelemetry.html")
+def template1():
+    cur = mysql.get_db().cursor()
+    cur.execute("select * from node_telemetry order by ts_created desc;")
+    results = cur.fetchall()
+    print("Type of results: ", type(results))
+    cur.close()
+    return render_template('nodeTelemetry.html', data=results)
 
 
 
