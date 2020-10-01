@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 from flaskext.mysql import MySQL
+import time
+
 
 app = Flask(__name__)
 
@@ -12,7 +14,24 @@ mysql.init_app(app)
 
 @app.route("/")
 def main():
-    return "Welcome!"
+    ts = str(int(time.time()))
+
+    jsInclude = '<script src="/static/js/scripts.js?t='+ts+'"></script>'
+    jsInclude += '<script src="https://kit.fontawesome.com/7daabcbab0.js" crossorigin="anonymous"></script>'
+    
+    cssInclude = '<link rel="stylesheet" href="static/css/styles.css?t='+ts+'">'
+
+    cur = mysql.get_db().cursor()
+    cur.execute("select * from node_list order by ts_created asc;")
+    results = cur.fetchall()
+    print("Type of results: ", type(results))
+    cur.close()
+    
+    templateData = {
+        'jsInclude' : jsInclude,
+        'cssInclude' : cssInclude
+    }
+    return render_template('index.html', **templateData, data=results)
 
 @app.route("/template.html")
 def template():

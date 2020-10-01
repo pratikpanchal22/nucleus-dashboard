@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- STAGE STATUS-->
+<div id="idDivStageStatus" style='display: block; overflow: hidden;'>
+    <center>
+        <h6 id="idStageSoundState"></h6>
+    </center>
+</div>
+
+
+<!-- STAGE -->
+<div id="idDivStage" style="display: none; overflow: hidden;">
+</div>
+
+<!-- LAUNCH PAGE -->
+<div id='idMainName'>
+    <center>
+        <div id='bg' style="background-image: url('static/images/toppng.com-colored-smoke-png-transparent-images-colorful-smoke-transparent-397x216.png'); opacity:0.3; background-position:center;"></div>        
+
+        <!--div style="max-width: 400px; min-width: 270px; overflow:hidden;">
+            <div id="idSoloOnDemandButton">
+                <i id="idSoloOnDemandIcon" class="fas fa-dove" style="color: rgb(79, 17, 212); font-size: 140px; width: 50%; float: left;"
+                    aria-hidden="true"></i>
+            </div>
+            <div id="idSymphonyOnDemandButton">
+                <i id="idSymphonyOnDemandIcon" class="fab fa-earlybirds"
+                    style="color: rgb(17, 62, 212); font-size: 140px; width: 50%; float: right;" aria-hidden="true"></i>
+            </div>
+            <br><br>
+            <div style="width:50%; float: left; font-size: 16px;"><b><i>Solo</i></b></div>
+            <div style="width:50%; float: right; font-size: 16px;"><b><i>Symphony</i></b></div>
+        </div-->
+
+        <br>
+        
+    </center>
+
+    
+    <!--
+    {% for i in data %}
+        <div class="card">
+            <div class="containerC">
+                <h5><b>{{i[4]}} (Node Id: {{i[3]}})</b></h5>
+                <h6><i>Seen few seconds ago @ 8:22 AM</i></h6> 
+                <p>test1</p>
+                <p>test1</p>
+                <p>test1</p>
+            </div>
+        </div>
+        <br>
+    {% endfor %}
+    <hr>
+    -->
+
+    <div id=idNodeList>
+    {% for i in data %}
+        <div class="grid-container" id="container-{{i[3]}}">
+            <div class="itemHeader">
+                <h3 id="header.{{i[3]}}"><b>{{i[4]}} ({{i[3]}})</b></h3>
+                <h6><i>Seen few seconds ago @ 8:22 AM</i></h6>
+            </div>
+            <div class="itemMain"> 
+                <p>Firmware: 0.x.y.z</p>
+                <p>test1</p>
+                <p>test1</p>
+            </div>
+            <div class="itemRight">
+                <p>192.168.1.999</p>
+                <p>Timezone: +05:30</p>
+                <p>Status: {{i[6]}}</p>
+            </div>
+            <div class="itemFooter">
+                <br>
+                <i class="fas fa-cogs fa-3x" id="settings-{{i[3]}}" style="margin-left: 10px; margin-right: 10px;"></i>
+                <i class="fas fa-search fa-3x" id="locate-{{i[3]}}" style="margin-left: 10px; margin-right: 10px;"></i>
+                <i class="fas fa-info-circle fa-3x" id="info-{{i[3]}}" style="margin-left: 10px; margin-right: 10px;"></i>
+                <i class="fas fa-power-off fa-3x" id="reboot-{{i[3]}}" style="margin-left: 10px; margin-right: 10px;"></i>
+            </div>
+        </div>
+        <br>
+    {% endfor %}
+    </div>
+
+    <h6>v 1.0</h6>
+
+
+</div>
+
+{% endblock %}
