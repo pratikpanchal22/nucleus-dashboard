@@ -10,7 +10,7 @@ $(document).ready(function () {
     }
 
     initializations();
-    getOnStageMetadata();
+    //getOnStageMetadata();
 });
 
 function initializations() {
@@ -18,8 +18,24 @@ function initializations() {
     stageIsHidden = true;
 
     $("#idNodeList").click(function(e){
-        console.log(e.target.id);
-    })
+        
+        if(e.target.id.length){
+            console.log(e.target.id);
+            
+            if(e.target.id.startsWith("button")){
+                $("#"+e.target.id).css("color", "orange");
+                $.getJSON("manageNode.json?nodeId="+ e.target.id.split("-")[2] +"&action=settings" + Math.floor(Date.now() / 1000), function (result) {
+                    console.log(result);
+                }).done(function (){
+                    console.log("done");
+                    $("#"+e.target.id).css("color", "black");
+                }).fail(function(xhr){
+                    console.log(xhr.responseText);
+                    $("#"+e.target.id).css("color", "red");
+                });
+            }
+        }
+    });
 
     //Set left-top icon
     $('#header-left').removeClass();
@@ -29,6 +45,7 @@ function initializations() {
     $("#header-left").click(function () {
         //settingsClickHandler();
         window.location.href = 'settings.html';
+        console.log("header-left clicked");
     });
 
     $("#idDivStage").on("click", ".childDiv", function () {
