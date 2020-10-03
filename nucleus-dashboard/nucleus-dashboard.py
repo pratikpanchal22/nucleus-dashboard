@@ -3,6 +3,10 @@ from flaskext.mysql import MySQL
 import time
 import json
 
+from models import dbConfig as dbc
+from models.data import Models
+from models.data import ModelType
+
 
 app = Flask(__name__)
 
@@ -22,11 +26,8 @@ def main():
     
     cssInclude = '<link rel="stylesheet" href="static/css/styles.css?t='+ts+'">'
 
-    cur = mysql.get_db().cursor()
-    cur.execute("select * from node_list order by ts_created asc;")
-    results = cur.fetchall()
+    results = Models(mysql.get_db()).fetch(ModelType.NODE_LIST)
     print("Type of results: ", type(results))
-    cur.close()
 
     newResults = ()
     for var in results:
