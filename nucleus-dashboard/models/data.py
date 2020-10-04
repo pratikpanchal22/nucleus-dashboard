@@ -9,7 +9,7 @@ class ModelType(Enum):
     UNINITIALIZED_MODEL_TYPE = 0
     #Fetch
     NODE_LIST = 1
-    METADATA_FOR_IDS = 2
+    NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID = 2
     INFO_FOR_ID = 3
     APP_SETTINGS = 4
     APP_SETTINGS_FOR_ID = 5
@@ -34,11 +34,26 @@ class Models:
         self.modelType = modelType
         
         if(self.modelType == ModelType.NODE_LIST):
-            self.query = ("select * from node_list order by ts_created asc;")
+            self.query = ("select id, "
+                        +"ts_created, "
+                        +"ts_last_updated, "
+                        +"nodeId, "
+                        +"name, "
+                        +"ip, "
+                        +"status "
+                        +"from node_list order by ts_created asc;")
         
-        elif(self.modelType == ModelType.APP_SETTINGS):
-            self.query = ("SELECT "+dbc.KEY_ID+", "+dbc.KEY_LAST_UPDATED+", "+dbc.KEY_SETTINGS+" "
-                              +" FROM "+dbc.TABLE_SETTINGS+" ORDER BY "+dbc.KEY_ID+" DESC LIMIT 1;")
+        elif(self.modelType == ModelType.NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID):
+            try:
+                nodeId = argv[0]
+            except:
+                print("ERROR: Expected nodeId")
+                return
+            
+            self.query = ("select * from node_telemetry "
+			                + " where nodeId = " 
+                            + str(nodeId)
+                            + " order by ts_created desc limit 1;")
         
         elif(self.modelType == ModelType.APP_SETTINGS_FOR_ID):
             try:

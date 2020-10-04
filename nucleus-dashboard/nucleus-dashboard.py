@@ -2,10 +2,13 @@ from flask import Flask, render_template, jsonify, request
 from flaskext.mysql import MySQL
 import time
 import json
+from datetime import datetime
 
 from models import dbConfig as dbc
 from models.data import Models
 from models.data import ModelType
+from common.utility import DateTimeEncoder as dte
+from common.utility import passed_time_string_for_past_dto
 
 
 app = Flask(__name__)
@@ -30,19 +33,25 @@ def main():
     print("Type of results: ", type(results))
 
     newResults = ()
+    nodeArrayJson = []
     for var in results:
-        nodeId = var[3]
-        nodeQuery = ("select * from node_telemetry"
-			            +" where nodeId = " + str(nodeId)
-                        +" order by ts_created desc limit 1;")
-        print (nodeQuery)
-        cur = mysql.get_db().cursor()
-        cur.execute(nodeQuery)
-        r = cur.fetchall()
-        print("nodeQuery results: ", r)
-        cur.close()
 
-        element = var + r[0]
+        nodeJson = {
+            "nodeId" : var[3],
+            "name" : var[4],
+            "status" : var[6],
+            "last_updated": var[2],
+            "last_seen": passed_time_string_for_past_dto(var[2])
+        }
+        
+        r = Models(mysql.get_db()).fetch(ModelType.NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID, nodeJson['nodeId'])[0]
+
+        nodeJson["apiIdKey"] = r[3]
+        nodeJson["apiIdValue"] = r[5]
+
+        nodeArrayJson.append(nodeJson)
+
+        element = var + r
 
         eList = list(element) #[*element]
         ctr=0
@@ -106,6 +115,9 @@ def main():
         print("\n\n")
 
     print("\n\n\nNew Results: ", newResults)
+    print("\n\n********************\nConstructed JSON: ", json.dumps(nodeArrayJson, cls=dte))
+
+    print("\n\nNodeArrayJson size: ", len(nodeArrayJson))
 
     for nr in newResults:
         ctx = 0
