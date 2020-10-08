@@ -44,50 +44,38 @@ def passed_time_string_for_past_dto(dto):
 
         diffStr = ""
         if(ts < 1):
-            diffStr = "less than a second"
+            diffStr += "less than a second"
         elif(ts < 60):
-            diffStr = str(ts) + " seconds"
+            diffStr += "{:.0f} seconds".format(ts)
         else:
             tm, ts = divmod(ts, 60)
-            diffStr = str(ts) + " seconds"
+            if(round(ts) > 0):
+                diffStr += " & {:.0f} seconds".format(ts)
 
             if(tm == 1):
-                diffStr = "A minute and " + diffStr 
+                diffStr = "a minute" + diffStr 
             elif(tm < 60):
-                diffStr = str(tm) + " minutes, " + diffStr
+                diffStr = "{:.0f} minutes".format(tm) + diffStr
             else:
                 th, tm = divmod(tm, 60)
-                diffStr = str(tm) + " minutes, " + diffStr
-        
-        #if(difference.year > 0):
-        #    diffStr += str(difference.year) + " year"
-        #    if(difference.year > 1):
-        #        diffStr += 's '
+                if(round(tm) > 0):
+                    diffStr = " & {:.0f} minutes".format(tm)
 
-        #if(difference.month > 0):
-        #    diffStr += str(difference.month) + " month"
-        #    if(difference.month > 1):
-        #        diffStr += 's '
+                if(th == 1):
+                    diffStr = "an hour" + diffStr 
+                elif(th < 24):
+                    diffStr = "{:.0f} hours".format(th) + diffStr
+                else:
+                    td, th = divmod(th, 24)
+                    if(round(th) > 0):
+                        diffStr = " & {:.0f} hours".format(th)
 
-        #if(difference.day > 0):
-        #    diffStr += str(difference.day) + " day"
-        #    if(difference.day > 1):
-        #        diffStr += 's '
-
-        #if(difference.hour > 0):
-        #    diffStr += str(difference.hour) + " hour"
-        #    if(difference.hour > 1):
-        #        diffStr += 's '       
-
-        #if(difference.minute > 0):
-        #    diffStr += str(difference.minute) + " minute"
-        #    if(difference.minute > 1):
-        #        diffStr += 's '    
-
-        #if(difference.second > 0):
-        #    diffStr += str(difference.second) + " second"
-        #    if(difference.second > 1):
-        #        diffStr += 's '
+                    if(td == 1):
+                        diffStr = "a day" + diffStr
+                    elif(td < 4):
+                        diffStr = "{:.0f} days".format(td) + diffStr
+                    else:
+                        diffStr = "{:.0f} days".format(td)
 
         if(diffStr != ""):
             diffStr += " ago"       

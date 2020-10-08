@@ -44,10 +44,24 @@ def main():
             "last_seen": passed_time_string_for_past_dto(var[2])
         }
         
-        r = Models(mysql.get_db()).fetch(ModelType.NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID, nodeJson['nodeId'])[0]
+        r = Models(mysql.get_db()).fetch(ModelType.NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID, 
+                                        nodeJson['nodeId'], 'System statistics')[0]
 
         nodeJson["apiIdKey"] = r[3]
         nodeJson["apiIdValue"] = r[5]
+
+        s = Models(mysql.get_db()).fetch(ModelType.NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID, 
+                                nodeJson['nodeId'], 'Identity')
+
+        try:
+            identityJson = json.loads(s[0][5])
+            nodeJson["firmware"] = identityJson['current']['version']
+            nodeJson["firmware build"] = identityJson['current']['build']
+            nodeJson["board"] = identityJson['current']['board']
+            nodeJson["First boot"] = identityJson['current']['fBoot']
+        except:
+            nodeJson["firmware"] = "Unavailabe"
+
 
         nodeArrayJson.append(nodeJson)
 
@@ -115,7 +129,7 @@ def main():
         print("\n\n")
 
     print("\n\n\nNew Results: ", newResults)
-    print("\n\n********************\nConstructed JSON: ", json.dumps(nodeArrayJson, cls=dte))
+    print("\n\n********************\nConstructed JSON: ", json.dumps(nodeArrayJson, cls=dte, indent=4, sort_keys=False))
 
     print("\n\nNodeArrayJson size: ", len(nodeArrayJson))
 
@@ -184,31 +198,69 @@ def managenodes():
     ts = str(int(time.time()))
 
     jsInclude = '<script src="/static/js/scripts.js?t='+ts+'"></script>'
-    jsInclude += '<script src="/static/js/manageNodes.js?t='+ts+'"></script>'
     jsInclude += '<script src="https://kit.fontawesome.com/7daabcbab0.js" crossorigin="anonymous"></script>'
     
     cssInclude = '<link rel="stylesheet" href="static/css/styles.css?t='+ts+'">'
 
-    cur = mysql.get_db().cursor()
-    cur.execute("select * from node_list order by ts_created asc;")
-    results = cur.fetchall()
+    results = Models(mysql.get_db()).fetch(ModelType.NODE_LIST)
     print("Type of results: ", type(results))
-    cur.close()
 
     newResults = ()
+    nodeArrayJson = []
     for var in results:
-        nodeId = var[3]
-        nodeQuery = ("select * from node_telemetry"
-			            +" where nodeId = " + str(nodeId)
-                        +" order by ts_created desc limit 1;")
-        print (nodeQuery)
-        cur = mysql.get_db().cursor()
-        cur.execute(nodeQuery)
-        r = cur.fetchall()
-        print("nodeQuery results: ", r)
-        cur.close()
 
-        element = var + r[0]
+        nodeJson = {
+            "nodeId" : var[3],
+            "name" : var[4],
+            "status" : var[6],
+            "last_updated": var[2],
+            "last_seen": passed_time_string_for_past_dto(var[2])
+        }
+        
+        #Fetch latest 'System statistics' record
+        try:
+            r = Models(mysql.get_db()).fetch(ModelType.NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID, 
+                                        nodeJson['nodeId'], 'System statistics')[0]
+        except:
+            print("No sysstat record found for the node")
+
+        print("\n\n\nType of r = ", type(r))
+        print("nodeId: ", var[3])
+
+        try:
+            jsonE = json.loads(r[5])
+        except:
+            jsonE = {}
+            print("Unable to convert to json")
+
+        try:
+            nodeJson["ip"] = jsonE['ip']
+        except:
+            nodeJson["ip"] = "IPV4 unknown"
+
+
+        #Fetch latest 'Identity' record
+        try:
+            s = Models(mysql.get_db()).fetch(ModelType.NODE_TELEMETRY_LATEST_RECORD_FOR_NODE_ID, 
+                                nodeJson['nodeId'], 'Identity')[0]
+        except:
+            print("no identity records found for the node")
+        
+        print("\n\n\nType of s = ", type(s))
+
+        try:
+            identityJson = json.loads(s[5])
+            nodeJson["firmware"] = identityJson['current']['version']
+            nodeJson["firmware build"] = identityJson['current']['build']
+            nodeJson["board"] = identityJson['current']['board']
+            nodeJson["First boot"] = identityJson['current']['fBoot']
+        except:
+            nodeJson["firmware"] = "Unavailabe"
+
+
+        nodeArrayJson.append(nodeJson)
+
+        element = var + r
 
         eList = list(element) #[*element]
         ctr=0
@@ -223,11 +275,9 @@ def managenodes():
                     print("Unable to convert to json")
 
                 try:
-                    print("JSON: ", jsonE['ip'])
                     itemIp = jsonE['ip']
                 except:
                     itemIp = "IPV4 unknown"
-                    print("ip not found")
 
                 try:    
                     print("JSON: ", jsonE['session']['uptime'])
@@ -272,6 +322,9 @@ def managenodes():
         print("\n\n")
 
     print("\n\n\nNew Results: ", newResults)
+    print("\n\n********************\nConstructed JSON: ", json.dumps(nodeArrayJson, cls=dte, indent=4, sort_keys=False))
+
+    print("\n\nNodeArrayJson size: ", len(nodeArrayJson))
 
     for nr in newResults:
         ctx = 0
@@ -283,7 +336,7 @@ def managenodes():
         'jsInclude' : jsInclude,
         'cssInclude' : cssInclude
     }
-    return render_template('manageNodes.html', **templateData, data=newResults)
+    return render_template('index.html', **templateData, data=newResults)
 
 
 

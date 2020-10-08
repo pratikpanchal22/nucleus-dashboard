@@ -49,10 +49,16 @@ class Models:
             except:
                 print("ERROR: Expected nodeId")
                 return
+
+            try:
+                apiId = argv[1]
+            except:
+                print("ERROR: api_id expected")
+                return
             
             self.query = ("select * from node_telemetry "
-			                + " where nodeId = " 
-                            + str(nodeId)
+			                + " where nodeId = " + str(nodeId)
+                            + " and api_id = '" + apiId + "'"
                             + " order by ts_created desc limit 1;")
         
         elif(self.modelType == ModelType.APP_SETTINGS_FOR_ID):
