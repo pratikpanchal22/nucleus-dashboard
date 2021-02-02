@@ -42,3 +42,34 @@ Requirement already satisfied: Werkzeug==1.0.1 in /home/user/.local/lib/python3.
 Installing collected packages: click, PyMySQL, Flask-MySQL, MarkupSafe, Jinja2
 Successfully installed Flask-MySQL-1.5.1 Jinja2-2.11.2 MarkupSafe-1.1.1 PyMySQL-0.10.1 click-7.1.2
 ```
+
+----------------------------------------------------------------------------------
+### Add application as a service
+
+```
+cp nucleus-dashboard/nucleus-dashboard.service /etc/systemd/system/.
+```
+
+Edit the User and Exec parameters to match the actual user the application needs to run as
+Edit the Exec parameter to match the correct path for python3 and nucleus-dashboard.py
+
+##### Start the service:  
+```
+systemctl start nucleus-dashboard.service
+``` 
+  
+##### Enable the service to start automatically on boot:  
+```
+systemctl enable nucleus-dashboard.service  
+```
+  
+##### To restart the service:  
+```
+systemctl restart nucleus-dashboard.service
+```
+or
+```
+systemctl stop nucleus-dashboard.service
+...
+systemctl start nucleus-dashboard.service
+```
